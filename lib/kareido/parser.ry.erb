@@ -1,0 +1,119 @@
+# vim: set ft=ruby
+<%
+  def camel_case(name)
+    name.split('_').map(&:capitalize).join
+  end
+
+  def repeat1(name, sep: nil)
+    <<-EOD
+    #{name}s : 
+        #{name}
+        { [val[0]] }
+      | #{name}s #{sep} #{name}
+        { val[0].push(val[1]) }
+    EOD
+  end
+
+  def repeat0(name, sep: nil)
+    <<-EOD
+    opt_#{name}s :
+        /* NONE */ 
+      { [] }
+      | #{name}s
+      { val[0] }
+
+    #{repeat1(name, sep: sep)}
+    EOD
+  end
+%>
+class Kareido::Parser
+  options no_result_var
+  token IDENT NUMBER
+rule
+    program :
+      opt_definitions
+      { Ast::Program.new(val[0]) }
+
+    definition :
+        defun
+      | extern
+    <%= repeat0 'definition' %>
+
+    defun:
+      'func' IDENT '(' opt_params ')' '{'
+         opt_statements
+      '}'
+      { Ast::Defun.new(val[1], val[3], val[6]) }
+
+    param : 
+      IDENT
+    <%= repeat0 'param', sep: "','" %>
+
+    extern:
+      'extern' IDENT '(' opt_params ')'
+      { Ast::Extern.new(val[1], val[3]) }
+
+    statement:
+        if_stmt
+      | expression
+    <%= repeat0 'statement' %>
+
+    if_stmt:
+      'if' '(' expression ')' '{'
+        opt_statements
+      '}'
+      opt_else
+      { Ast::If.new(val[2], val[5], val[7]) }
+
+    opt_else:
+        /* NONE */
+      { nil }
+      | 'else' '{' expression '}'
+      { val[2] }
+
+    expression:
+      literal
+    <%= repeat0 'expression' %>
+
+    literal:
+      NUMBER
+end
+
+---- header
+require 'strscan'
+
+---- inner
+KEYWORDS = /func|if|for|extern/
+
+SYMBOLS = /[(){},.+-*\/%=]/
+
+def parse(str)
+  @yydebug = true
+
+  @q = []
+  s = StringScanner.new(str)
+  until s.empty?
+    case
+    when s.scan(/\s+/)
+      # skip whitespace
+    when s.scan(%r{//.*\n})
+      # skip comment
+    when m = s.scan(SYMBOLS)
+      @q << [m, nil]
+    when m = s.scan(/\d+(\.\d+)?/)
+      @q << [:NUMBER, m.to_f]
+    when m = s.scan(KEYWORDS)
+      @q << [m, m.to_sym]
+    when m = s.scan(/\w+/)
+      @q << [:IDENT, m]
+    else
+      raise "no match: #{s.inspect}"
+    end
+  end
+
+  do_parse
+end
+
+def next_token
+  @q.shift
+end
