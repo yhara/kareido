@@ -29,10 +29,22 @@
 class Kareido::Parser
   options no_result_var
   token IDENT NUMBER
+
+  prechigh
+    nonassoc UMINUS
+    left '*' '/' '%'
+    left '+' '-'
+    left '>' '>=' '<' '<='
+    nonassoc '==' '!='
+    left '&&'
+    left '||'
+  preclow
+
 rule
     program :
       opt_definitions
-      { Ast::Program.new(val[0]) }
+      opt_statements
+      { Ast::Program.new(val[0], val[1]) }
 
     definition :
         defun
@@ -50,42 +62,78 @@ rule
     <%= repeat0 'param', sep: "','" %>
 
     extern:
-      'extern' IDENT '(' opt_params ')'
+      'extern' IDENT '(' opt_params ')' ';'
       { Ast::Extern.new(val[1], val[3]) }
 
     statement:
         if_stmt
-      | expression
+      | for_stmt
+      | expression ';'
+      { val[0] }
     <%= repeat0 'statement' %>
 
     if_stmt:
-      'if' '(' expression ')' '{'
-        opt_statements
-      '}'
-      opt_else
-      { Ast::If.new(val[2], val[5], val[7]) }
+        'if' '(' expression ')' block
+        opt_else
+      { Ast::If.new(val[2], val[5], val[6]) }
+
+    block:
+        '{' opt_statements '}'
+      { val[1] }
+      | statement
 
     opt_else:
         /* NONE */
       { nil }
-      | 'else' '{' expression '}'
-      { val[2] }
+      | 'else' block
+      { val[1] }
+
+    for_stmt:
+        'for' '(' IDENT ';' expression '...' expression ';' expression ')' block
+      { Ast::For.new(val[2], val[4], val[6], val[8]) }
 
     expression:
-      literal
+        fcall
+      | varref
+      | literal
+
+      <% ops = %w(+ - * / % > < >= <= == != && ||) %>
+      <% ops.each do |op| %>
+      | expression '<%= op %>' expression
+      { Ast::BinExpr.new("<%= op %>", val[0], val[2]) }
+      <% end %>
+
+      | '-' expression =UMINUS
+      { Ast::UnaryExpr.new("-", val[1]) }
+
+      | '(' expression ')'
+      { val[1] }
     <%= repeat0 'expression' %>
+
+    fcall:
+        IDENT '(' opt_args ')'
+      { Ast::FunCall.new(val[0], val[2]) }
+
+    arg:
+        expression
+    <%= repeat0 'arg', sep: "','" %>
+
+    varref:
+      IDENT
+      { Ast::VarRef.new(val[0]) }
 
     literal:
       NUMBER
+      { Ast::Literal.new(val[0]) }
 end
 
 ---- header
 require 'strscan'
 
 ---- inner
-KEYWORDS = /func|if|for|extern/
+KEYWORDS = /extern|func|if|else|for/
 
-SYMBOLS = /[(){},.+-*\/%=]/
+SYMBOLS = /(\.\.\.)|(>=)|(<=)|(==)|(!=)|(&&)|(\|\|)|[\<\>\(\)\{\}\.\+\-\*\/\%\=\,;]/
 
 def parse(str)
   @yydebug = true
@@ -99,7 +147,7 @@ def parse(str)
     when s.scan(%r{//.*\n})
       # skip comment
     when m = s.scan(SYMBOLS)
-      @q << [m, nil]
+      @q << [m, m]
     when m = s.scan(/\d+(\.\d+)?/)
       @q << [:NUMBER, m.to_f]
     when m = s.scan(KEYWORDS)
@@ -112,6 +160,9 @@ def parse(str)
   end
 
   do_parse
+rescue 
+  p q: @q
+  raise
 end
 
 def next_token

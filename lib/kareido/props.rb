@@ -1,4 +1,4 @@
-module FjR
+module Kareido
   module Props
     def props(*names)
       class_eval <<-EOD
