@@ -5,8 +5,9 @@ file 'lib/kareido/parser.ry' => 'lib/kareido/parser.ry.erb' do
 end
 
 file 'lib/kareido/parser.rb' => 'lib/kareido/parser.ry' do
-  # hint: add -g to debug parser (run `rake -B` for force rebuild)
-  sh "racc -o lib/kareido/parser.rb lib/kareido/parser.ry"
+  cmd = "racc -o lib/kareido/parser.rb lib/kareido/parser.ry"
+  cmd.sub!("racc", "racc --debug") if ENV["DEBUG"]
+  sh cmd
 end
 
 task :default => 'lib/kareido/parser.rb' do
