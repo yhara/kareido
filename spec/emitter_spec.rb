@@ -2,7 +2,8 @@ require 'spec_helper'
 
 describe "ll emitter" do
   def to_ll(src)
-    Kareido::Parser.new.parse(src).to_ll
+    ast = Kareido::Parser.new.parse(src)
+    ast.to_ll.map{|x| x + "\n"}.join
   end
 
   describe "extern" do
@@ -12,6 +13,25 @@ describe "ll emitter" do
       EOD
       expect(ll).to eq(<<~EOD)
         declare i32 @putchar(i32)
+        define i32 @main() {
+          ret i32 0
+        }
+      EOD
+    end
+  end
+
+  describe "main stmts" do
+    it "should be the body of @main" do
+      ll = to_ll(<<~EOD)
+        #extern declare i32 @putchar(i32)
+        1;
+      EOD
+      expect(ll).to eq(<<~EOD)
+        declare i32 @putchar(i32)
+        define i32 @main() {
+        1
+          ret i32 0
+        }
       EOD
     end
   end

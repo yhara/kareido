@@ -5,11 +5,23 @@ module Kareido
     end
 
     class Program < Node
-      props :defs, :main_stmts
+      props :defs, :main
 
       def to_ll
-        defs.map(&:to_ll).join +
-          main_stmts.map(&:to_ll).join
+        defs.flat_map(&:to_ll) + main.to_ll
+      end
+    end
+
+    class Main < Node
+      props :stmts
+
+      def to_ll
+        [
+          "define i32 @main() {",
+          *stmts.map(&:to_ll),
+          "  ret i32 0",
+          "}",
+        ]
       end
     end
 
@@ -21,7 +33,7 @@ module Kareido
       props :body
 
       def to_ll
-        @body + "\n"
+        [@body]
       end
     end
 

@@ -44,7 +44,8 @@ rule
     program :
       opt_definitions
       opt_statements
-      { Ast::Program.new(val[0], val[1]) }
+      { Ast::Program.new(val[0],
+          Ast::Main.new(val[1])) }
 
     definition :
         defun
@@ -151,7 +152,7 @@ def parse(str)
     when m = s.scan(/^#extern (.+)\n/)
       @q << [:EXTERN, s[1]]
     when m = s.scan(/\d+(\.\d+)?/)
-      @q << [:NUMBER, m.to_f]
+      @q << [:NUMBER, m.to_i]
     when m = s.scan(KEYWORDS)
       @q << [m, m.to_sym]
     when m = s.scan(/\w+/)
