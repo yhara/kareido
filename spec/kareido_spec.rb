@@ -1,20 +1,20 @@
 require 'spec_helper'
 
 MANDEL = <<EOD
-extern putchard(char);
+#extern declare i32 @putchar(i32)
 
 func printdensity(d) {
   if (d > 8) {
-    putchard(32);  // ' '
+    putchar(32);  // ' '
   }
   else if (d > 4) {
-    putchard(46);  // '.'
+    putchar(46);  // '.'
   }
   else if (d > 2) {
-    putchard(43);  // '+'
+    putchar(43);  // '+'
   }
   else {
-    putchard(42); // '*'
+    putchar(42); // '*'
   }
 }
 
@@ -38,7 +38,7 @@ func mandelhelp(xmin, xmax, xstep, ymin, ymax, ystep) {
     for (x ; xmin ... xmax ; xstep) {
        printdensity(mandleconverge(x,y));
     }
-    putchard(10);
+    putchar(10);
   }
 }
 
@@ -53,7 +53,6 @@ EOD
 describe Kareido do
   it 'should parse example program' do
     ast = Kareido::Parser.new.parse(MANDEL)
-    p ast: ast
     expect(ast).to be_kind_of(Kareido::Ast::Node)
   end
 end

@@ -6,6 +6,11 @@ module Kareido
 
     class Program < Node
       props :defs, :main_stmts
+
+      def to_ll
+        defs.map(&:to_ll).join +
+          main_stmts.map(&:to_ll).join
+      end
     end
 
     class Defun < Node
@@ -13,10 +18,10 @@ module Kareido
     end
 
     class Extern < Node
-      props :name, :param_names
+      props :body
 
       def to_ll
-
+        @body + "\n"
       end
     end
 

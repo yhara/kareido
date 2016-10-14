@@ -28,7 +28,7 @@
 %>
 class Kareido::Parser
   options no_result_var
-  token IDENT NUMBER
+  token IDENT NUMBER EXTERN
 
   prechigh
     nonassoc UMINUS
@@ -62,8 +62,8 @@ rule
     <%= repeat0 'param', sep: "','" %>
 
     extern:
-      'extern' IDENT '(' opt_params ')' ';'
-      { Ast::Extern.new(val[1], val[3]) }
+      EXTERN
+      { Ast::Extern.new(val[0]) }
 
     statement:
         if_stmt
@@ -148,6 +148,8 @@ def parse(str)
       # skip comment
     when m = s.scan(SYMBOLS)
       @q << [m, m]
+    when m = s.scan(/^#extern (.+)\n/)
+      @q << [:EXTERN, s[1]]
     when m = s.scan(/\d+(\.\d+)?/)
       @q << [:NUMBER, m.to_f]
     when m = s.scan(KEYWORDS)
