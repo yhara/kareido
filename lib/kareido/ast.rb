@@ -100,7 +100,7 @@ module Kareido
 
         r = newreg
         ll = args_ll + [
-          "%reg#{r} = call #{target.ret_type} @#{name}(#{args_and_types})"
+          "  %reg#{r} = call #{target.ret_type} @#{name}(#{args_and_types})"
         ]
         return ll, r
       end
@@ -117,7 +117,7 @@ module Kareido
         case @value
         when Numeric
           r = newreg
-          return ["%reg#{r} = add i32 0, #{@value}"],
+          return ["  %reg#{r} = add i32 0, #{@value}"],
                  r
         else
           raise

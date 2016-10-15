@@ -29,8 +29,8 @@ describe "ll emitter:" do
       expect(ll).to eq(<<~EOD)
         declare i32 @putchar(i32)
         define i32 @main() {
-        %reg1 = add i32 0, 65
-        %reg2 = call i32 @putchar(i32 %reg1)
+          %reg1 = add i32 0, 65
+          %reg2 = call i32 @putchar(i32 %reg1)
           ret i32 0
         }
       EOD
