@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 MANDEL = <<EOD
-#extern declare i32 @putchar(i32)
+extern i32 putchar(i32);
 
 func printdensity(d) {
   if (d > 8) {

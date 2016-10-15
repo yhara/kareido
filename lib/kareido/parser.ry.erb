@@ -28,7 +28,7 @@
 %>
 class Kareido::Parser
   options no_result_var
-  token IDENT NUMBER EXTERN
+  token IDENT NUMBER
 
   prechigh
     nonassoc UMINUS
@@ -63,14 +63,18 @@ rule
     <%= repeat0 'param', sep: "','" %>
 
     extern:
-      EXTERN
-      { Ast::Extern.new(val[0]) }
+        'extern' IDENT IDENT '(' opt_param_types ')' ';'
+      { Ast::Extern.new(val[1], val[2], val[4]) }
+
+    param_type :
+        IDENT
+    <%= repeat0 'param_type', sep: "','" %>
 
     statement:
         if_stmt
       | for_stmt
       | expression ';'
-      { val[0] }
+      { Ast::ExprStmt.new(val[0]) }
     <%= repeat0 'statement' %>
 
     if_stmt:
