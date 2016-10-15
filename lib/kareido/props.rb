@@ -1,19 +1,20 @@
 module Kareido
   module Props
     def props(*names)
-      class_eval <<-EOD
-        def initialize(#{names.join ', '})
-          #{names.map{|x| "@#{x}"}.join ', '} = #{names.join ', '}
-          init
+      define_method "initialize" do |*args|
+        if names.length != args.length
+          raise ArgumentError,
+            "wrong number of arguments (given #{args.length}, expected #{names.length})"
         end
-        attr_reader #{names.map(&:inspect).join ', '}
-
-        private
-
-        # Override this method instead of #initialize.
-        def init
+        names.zip(args).each do |name, arg|
+          instance_variable_set("@#{name}", arg)
         end
-      EOD
+        init
+      end
+      attr_reader *names
+
+      define_method "init", proc{}
+      private "init"
     end
   end
 end
