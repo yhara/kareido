@@ -24,12 +24,12 @@ describe "ll emitter:" do
     it "should be the body of @main" do
       ll = to_ll(<<~EOD)
         extern i32 putchar(i32);
-        putchar(56);
+        putchar(65);
       EOD
       expect(ll).to eq(<<~EOD)
         declare i32 @putchar(i32)
         define i32 @main() {
-        %reg1 = add i32 0, 56
+        %reg1 = add i32 0, 65
         %reg2 = call i32 @putchar(i32 %reg1)
           ret i32 0
         }
