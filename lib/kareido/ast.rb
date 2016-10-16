@@ -3,7 +3,12 @@ module Kareido
     class Node
       extend Props
 
-      @@reg = 0
+      # For testing
+      def self.reset_regnum
+        @@reg = 0
+      end
+      reset_regnum
+
       def newreg
         return (@@reg += 1)
       end
@@ -73,8 +78,27 @@ module Kareido
       end
     end
 
+    BINOPS = {
+      "+" => "fadd",
+      "-" => "fsub",
+      "*" => "fmul",
+      "/" => "fdiv",
+      "%" => "frem",
+    }
+    # TODO: > < >= <= == != && ||
     class BinExpr < Node
-      props :op, :left, :right
+      props :op, :left_expr, :right_expr
+
+      def to_ll_r(prog)
+        ll1, r1 = @left_expr.to_ll_r(prog)
+        ll2, r2 = @right_expr.to_ll_r(prog)
+        ope = BINOPS[@op] or raise "op #{@op} not implemented yet"
+
+        ll = ll1 + ll2
+        r3 = newreg
+        ll << "  %reg#{r3} = #{ope} double %reg#{r1}, %reg#{r2}"
+        return ll, r3
+      end
     end
 
     class UnaryExpr < Node
@@ -92,17 +116,35 @@ module Kareido
           raise "Invalid number of arguments (#{@name})"
         end
 
-        converted = @args.map{|x| x.to_ll_r(prog)}
-        args_ll = converted.flat_map(&:first)
-        arg_regs = converted.map(&:last)
-        args_and_types = target.param_types.zip(arg_regs)
-          .map{|ty, r| "#{ty} %reg#{r}"}.join(", ")
+        ll = []
+        args_and_types = []
+        @args.map{|x| x.to_ll_r(prog)}.each.with_index do |(arg_ll, arg_r), i|
+          type = target.param_types[i]
+          ll.concat(arg_ll)
+          case type
+          when "i32"
+            rr = newreg
+            ll << "  %reg#{rr} = fptosi double %reg#{arg_r} to i32"
+            args_and_types << "i32 %reg#{rr}"
+          when "double"
+            args_and_types << "double %reg#{arg_r}"
+          else
+            raise "type #{type} is not supported"
+          end
+        end
 
         r = newreg
-        ll = args_ll + [
-          "  %reg#{r} = call #{target.ret_type} @#{name}(#{args_and_types})"
-        ]
-        return ll, r
+        ll << "  %reg#{r} = call #{target.ret_type} @#{name}(#{args_and_types.join(', ')})"
+        case target.ret_type
+        when "i32"
+          rr = newreg
+          ll << "  %reg#{rr} = sitofp i32 %reg#{r} to double"
+          return ll, rr
+        when "double"
+          return ll, r
+        else
+          raise "type #{type} is not supported"
+        end
       end
     end
 
