@@ -4,19 +4,15 @@ Yet another LLVM example program, inspired by [the official one](http://llvm.org
 
 ## The Language
 
-Number 
+Number (all numbers are treated as `double`)
 
 	12345
 	1.3
 
-String
-
-	"hello"
-
 Unary operators
 
-	-1
-	+1
+	-x
+  (Note: unary + (eg. +x) is not supported)
 
 Binary operators
 
@@ -27,7 +23,7 @@ Binary operators
 
 Conditional
 
-	if (x == 1) {   // curly bracket is mandatory
+	if (x == 1) {
 		y = 2
 	}
 	else {
@@ -40,11 +36,11 @@ Loop
 		x *= 5
 	}
 
-Var
-	
-	var (a = 1, b = 2) {
-	}
+Extern
 
-Call
+  // only 'i32' or 'double' is supported
+  extern i32 putchar(i32);
 
-...
+## License
+
+MIT
