@@ -115,10 +115,12 @@ module Kareido
 
       def to_ll_r(prog)
         case @value
-        when Numeric
+        when Float
           r = newreg
-          return ["  %reg#{r} = add i32 0, #{@value}"],
-                 r
+          return ["  %reg#{r} = add double 0.0, #{@value}"], r
+        when Integer
+          r = newreg
+          return ["  %reg#{r} = add double 0.0, #{@value}.0"], r
         else
           raise
         end

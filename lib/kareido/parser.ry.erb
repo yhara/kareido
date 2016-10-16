@@ -28,7 +28,7 @@
 %>
 class Kareido::Parser
   options no_result_var
-  token IDENT NUMBER
+  token IDENT FLOAT INTEGER
 
   prechigh
     nonassoc UMINUS
@@ -128,7 +128,9 @@ rule
       { Ast::VarRef.new(val[0]) }
 
     literal:
-      NUMBER
+        FLOAT
+      { Ast::Literal.new(val[0]) }
+      | INTEGER
       { Ast::Literal.new(val[0]) }
 end
 
@@ -155,8 +157,10 @@ def parse(str)
       @q << [m, m]
     when m = s.scan(/^#extern (.+)\n/)
       @q << [:EXTERN, s[1]]
-    when m = s.scan(/\d+(\.\d+)?/)
-      @q << [:NUMBER, m.to_i]
+    when m = s.scan(/\d+\.\d+/)
+      @q << [:FLOAT, m.to_f]
+    when m = s.scan(/\d+/)
+      @q << [:INTEGER, m.to_i]
     when m = s.scan(KEYWORDS)
       @q << [m, m.to_sym]
     when m = s.scan(/\w+/)
