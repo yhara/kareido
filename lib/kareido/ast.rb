@@ -6,6 +6,7 @@ module Kareido
       def self.reset
         @@reg = 0
         @@if = 0
+        @@for = 0
       end
       reset
 
@@ -16,6 +17,10 @@ module Kareido
 
       def newif
         return (@@if += 1)
+      end
+
+      def newfor
+        return (@@for += 1)
       end
     end
 
@@ -170,7 +175,36 @@ module Kareido
     end
 
     class For < Node
-      props :varname, :nbegin, :nend, :step, :body_stmts
+      props :varname, :begin_expr, :end_expr, :step_expr, :body_stmts
+
+      def to_ll(prog, env)
+        begin_ll, begin_r = begin_expr.to_ll_r(prog, env)
+        end_ll, end_r = end_expr.to_ll_r(prog, env)
+        step_ll, step_r = step_expr.to_ll_r(prog, env)
+        body_ll = body_stmts.flat_map{|x| x.to_ll(prog, env + [varname])}
+
+        i = newfor
+        ll = []
+        ll.concat begin_ll
+        ll.concat end_ll
+        ll.concat step_ll
+        ll << "  br label %For#{i}"
+        ll << "For#{i}:"
+        ll << "  br label %Loop#{i}"
+
+        ll << "Loop#{i}:"
+        ll << "  %x = phi double [#{begin_r}, %For#{i}], [%fori#{i}, %ForBody#{i}]"
+        ll << "  %forc#{i} = fcmp ogt double %#{varname}, #{end_r}"
+        ll << "  br i1 %forc#{i}, label %EndFor#{i}, label %ForBody#{i}"
+
+        ll << "ForBody#{i}:"
+        ll.concat body_ll
+        ll << "  %fori#{i} = fadd double %#{varname}, #{step_r}"
+        ll << "  br label %Loop#{i}"
+
+        ll << "EndFor#{i}:"
+        return ll
+      end
     end
 
     class Return < Node

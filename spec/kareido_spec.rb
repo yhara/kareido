@@ -156,5 +156,15 @@ describe Kareido do
       src = "extern i32 putchar(i32); putchar(-(-65));"
       expect(Kareido.run(src)).to eq("A")
     end
+
+    it 'for' do
+      src = <<-EOD
+        extern i32 putchar(i32);
+        for (x; 65 ... 70 ; 2) {
+          putchar(x);
+        }
+      EOD
+      expect(Kareido.run(src)).to eq("ACE")
+    end
   end
 end

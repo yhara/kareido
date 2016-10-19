@@ -88,6 +88,40 @@ describe "ll emitter:" do
     end
   end
 
+  describe "for stmt" do
+    it "should expand into loop" do
+      ll = to_ll(<<~EOD)
+        extern i32 putchar(i32);
+        for (x; 65 ... 70 ; 2) {
+          putchar(x);
+        }
+      EOD
+      expect(ll).to eq(<<~EOD)
+        declare i32 @putchar(i32)
+        define i32 @main() {
+          %reg1 = fadd double 0.0, 65.0
+          %reg2 = fadd double 0.0, 70.0
+          %reg3 = fadd double 0.0, 2.0
+          br label %For1
+        For1:
+          br label %Loop1
+        Loop1:
+          %x = phi double [%reg1, %For1], [%fori1, %ForBody1]
+          %forc1 = fcmp ogt double %x, %reg2
+          br i1 %forc1, label %EndFor1, label %ForBody1
+        ForBody1:
+          %reg4 = fptosi double %x to i32
+          %reg5 = call i32 @putchar(i32 %reg4)
+          %reg6 = sitofp i32 %reg5 to double
+          %fori1 = fadd double %x, %reg3
+          br label %Loop1
+        EndFor1:
+          ret i32 0
+        }
+      EOD
+    end
+  end
+
   describe "binary expr" do
     describe "`+`" do
       it "should conveted to add" do
@@ -133,7 +167,4 @@ describe "ll emitter:" do
       end
     end
   end
-
-  #describe "for"
-  # && ||
 end
