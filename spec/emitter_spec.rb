@@ -39,29 +39,6 @@ describe "ll emitter:" do
     end
   end
 
-  context "binary expr" do
-    describe "`+`" do
-      it "should conveted to add" do
-        ll = to_ll(<<~EOD)
-          extern i32 putchar(i32);
-          putchar(60 + 5);
-        EOD
-        expect(ll).to eq(<<~EOD)
-          declare i32 @putchar(i32)
-          define i32 @main() {
-            %reg1 = fadd double 0.0, 60.0
-            %reg2 = fadd double 0.0, 5.0
-            %reg3 = fadd double %reg1, %reg2
-            %reg4 = fptosi double %reg3 to i32
-            %reg5 = call i32 @putchar(i32 %reg4)
-            %reg6 = sitofp i32 %reg5 to double
-            ret i32 0
-          }
-        EOD
-      end
-    end
-  end
-
   describe "if stmt" do
     it "true case" do
       ll = to_ll(<<~EOD)
@@ -88,6 +65,29 @@ describe "ll emitter:" do
           ret i32 0
         }
       EOD
+    end
+  end
+
+  context "binary expr" do
+    describe "`+`" do
+      it "should conveted to add" do
+        ll = to_ll(<<~EOD)
+          extern i32 putchar(i32);
+          putchar(60 + 5);
+        EOD
+        expect(ll).to eq(<<~EOD)
+          declare i32 @putchar(i32)
+          define i32 @main() {
+            %reg1 = fadd double 0.0, 60.0
+            %reg2 = fadd double 0.0, 5.0
+            %reg3 = fadd double %reg1, %reg2
+            %reg4 = fptosi double %reg3 to i32
+            %reg5 = call i32 @putchar(i32 %reg4)
+            %reg6 = sitofp i32 %reg5 to double
+            ret i32 0
+          }
+        EOD
+      end
     end
   end
 
