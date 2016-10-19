@@ -63,7 +63,7 @@ Function
     extern i32 putchar(i32);
     func add(x, y) {
       return x + y;
-      // NOTE: A function must have a `return`, but kareido does not check it yet
+      // Note: 0.0 is returned if `return` is omit in a function definition
     }
     // main
     putchar(add(60, 5));
