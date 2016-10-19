@@ -168,8 +168,8 @@ module Kareido
         if @else_stmts.any?
           ll << "Else#{i}:"
           ll.concat else_ll  # fallthrough
+          ll << "  br label %EndIf#{i}"
         end
-        ll << "  br label %EndIf#{i}"
         ll << "EndIf#{i}:"
         return ll
       end
@@ -186,20 +186,23 @@ module Kareido
 
         i = newfor
         ll = []
+        ll << "  br label %For#{i}"
+        ll << "For#{i}:"
         ll.concat begin_ll
         ll.concat end_ll
         ll.concat step_ll
-        ll << "  br label %For#{i}"
-        ll << "For#{i}:"
         ll << "  br label %Loop#{i}"
 
         ll << "Loop#{i}:"
-        ll << "  %x = phi double [#{begin_r}, %For#{i}], [%fori#{i}, %ForBody#{i}]"
-        ll << "  %forc#{i} = fcmp ogt double %#{varname}, #{end_r}"
+        ll << "  %#{varname} = phi double [#{begin_r}, %For#{i}], [%fori#{i}, %ForInc#{i}]"
+        ll << "  %forc#{i} = fcmp oge double %#{varname}, #{end_r}"
         ll << "  br i1 %forc#{i}, label %EndFor#{i}, label %ForBody#{i}"
 
         ll << "ForBody#{i}:"
         ll.concat body_ll
+        ll << "  br label %ForInc#{i}"
+
+        ll << "ForInc#{i}:"
         ll << "  %fori#{i} = fadd double %#{varname}, #{step_r}"
         ll << "  br label %Loop#{i}"
 
