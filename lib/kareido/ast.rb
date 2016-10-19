@@ -10,7 +10,8 @@ module Kareido
       reset
 
       def newreg
-        return (@@reg += 1)
+        @@reg += 1
+        return "%reg#{@@reg}"
       end
 
       def newif
@@ -80,7 +81,7 @@ module Kareido
         ll << "Test#{l}:"
         ll.concat cond_ll
         endif = (@else_stmts.any? ? "%Else#{l}" : "%EndIf#{l}")
-        ll << "  br i1 %reg#{cond_r}, label %Then#{l}, label #{endif}"
+        ll << "  br i1 #{cond_r}, label %Then#{l}, label #{endif}"
         ll << "Then#{l}:"
         ll.concat then_ll
         ll << "  br label %EndIf#{l}"
@@ -130,7 +131,7 @@ module Kareido
 
         ll = ll1 + ll2
         r3 = newreg
-        ll << "  %reg#{r3} = #{ope} double %reg#{r1}, %reg#{r2}"
+        ll << "  #{r3} = #{ope} double #{r1}, #{r2}"
         return ll, r3
       end
     end
@@ -158,21 +159,21 @@ module Kareido
           case type
           when "i32"
             rr = newreg
-            ll << "  %reg#{rr} = fptosi double %reg#{arg_r} to i32"
-            args_and_types << "i32 %reg#{rr}"
+            ll << "  #{rr} = fptosi double #{arg_r} to i32"
+            args_and_types << "i32 #{rr}"
           when "double"
-            args_and_types << "double %reg#{arg_r}"
+            args_and_types << "double #{arg_r}"
           else
             raise "type #{type} is not supported"
           end
         end
 
         r = newreg
-        ll << "  %reg#{r} = call #{target.ret_type} @#{name}(#{args_and_types.join(', ')})"
+        ll << "  #{r} = call #{target.ret_type} @#{name}(#{args_and_types.join(', ')})"
         case target.ret_type
         when "i32"
           rr = newreg
-          ll << "  %reg#{rr} = sitofp i32 %reg#{r} to double"
+          ll << "  #{rr} = sitofp i32 #{r} to double"
           return ll, rr
         when "double"
           return ll, r
@@ -193,10 +194,10 @@ module Kareido
         case @value
         when Float
           r = newreg
-          return ["  %reg#{r} = fadd double 0.0, #{@value}"], r
+          return ["  #{r} = fadd double 0.0, #{@value}"], r
         when Integer
           r = newreg
-          return ["  %reg#{r} = fadd double 0.0, #{@value}.0"], r
+          return ["  #{r} = fadd double 0.0, #{@value}.0"], r
         else
           raise
         end
