@@ -8,9 +8,13 @@ require 'kareido/ast'
 require 'kareido/parser'
 
 module Kareido
-  def self.run(src)
+  def self.compile(src)
     ast = Parser.new.parse(src)
-    ll = ast.to_ll
+    return ast.to_ll
+  end
+
+  def self.run(src)
+    ll = compile(src)
     #puts ll
     temp = Tempfile.new
     temp.write(ll)

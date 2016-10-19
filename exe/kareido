@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+require 'thor'
+require 'kareido'
+
+module Kareido
+  class Cli < Thor
+    desc "compile FILE", "compile and run kareido script"
+    def compile(kar_path)
+      ll_path = if kar_path.end_with?(".kar")
+                  kar_path.sub(/\.kar\z/, ".ll")
+                else
+                  kar_path + ".ll"
+                end
+      ll = Kareido.compile(File.read(kar_path))
+      File.write(ll_path, ll)
+      return ll_path
+    end
+
+    desc "exec FILE", "compile and run kareido script"
+    def exec(kar_path)
+      ll_path = compile(kar_path)
+      system "lli", ll_path
+    end
+  end
+end
+
+Kareido::Cli.start(ARGV)
