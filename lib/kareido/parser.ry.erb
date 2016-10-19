@@ -79,23 +79,24 @@ rule
     <%= repeat0 'statement' %>
 
     if_stmt:
-        'if' '(' expression ')' block
+        'if' '(' expression ')' block_or_stmt
         opt_else
       { Ast::If.new(val[2], val[4], val[5]) }
 
-    block:
+    block_or_stmt:
         '{' opt_statements '}'
       { val[1] }
       | statement
+      { [val[0]] }
 
     opt_else:
         /* NONE */
       { [] }
-      | 'else' block
+      | 'else' block_or_stmt
       { val[1] }
 
     for_stmt:
-        'for' '(' IDENT ';' expression '...' expression ';' expression ')' block
+        'for' '(' IDENT ';' expression '...' expression ';' expression ')' block_or_stmt
       { Ast::For.new(val[2], val[4], val[6], val[8], val[10]) }
 
     return_stmt:
