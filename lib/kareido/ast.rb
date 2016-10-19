@@ -154,7 +154,6 @@ module Kareido
         else_ll = @else_stmts.flat_map{|x| x.to_ll(prog, env)}
 
         ll = []
-        ll << "Test#{l}:"
         ll.concat cond_ll
         endif = (@else_stmts.any? ? "%Else#{l}" : "%EndIf#{l}")
         ll << "  br i1 #{cond_r}, label %Then#{l}, label #{endif}"

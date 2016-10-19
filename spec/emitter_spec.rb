@@ -71,7 +71,6 @@ describe "ll emitter:" do
       expect(ll).to eq(<<~EOD)
         declare i32 @putchar(i32)
         define i32 @main() {
-        Test1:
           %reg1 = fadd double 0.0, 1.0
           %reg2 = fadd double 0.0, 2.0
           %reg3 = fcmp olt double %reg1, %reg2
