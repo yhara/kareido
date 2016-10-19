@@ -1,4 +1,5 @@
 require 'tempfile'
+require 'pp'
 
 module Kareido; end
 require 'kareido/props'
