@@ -197,20 +197,22 @@ module Kareido
     end
 
     BINOPS = {
-      "+" => "fadd",
-      "-" => "fsub",
-      "*" => "fmul",
-      "/" => "fdiv",
-      "%" => "frem",
+      "+" => "fadd double",
+      "-" => "fsub double",
+      "*" => "fmul double",
+      "/" => "fdiv double",
+      "%" => "frem double",
 
-      "==" => "fcmp oeq",
-      ">" => "fcmp ogt",
-      ">=" => "fcmp oge",
-      "<" => "fcmp olt",
-      "<=" => "fcmp ole",
-      "!=" => "fcmp one",
+      "==" => "fcmp oeq double",
+      ">" => "fcmp ogt double",
+      ">=" => "fcmp oge double",
+      "<" => "fcmp olt double",
+      "<=" => "fcmp ole double",
+      "!=" => "fcmp one double",
+
+      "&&" => "and i1",
+      "||" => "or i1",
     }
-    # TODO: && ||
     class BinExpr < Node
       props :op, :left_expr, :right_expr
 
@@ -221,7 +223,7 @@ module Kareido
 
         ll = ll1 + ll2
         r3 = newreg
-        ll << "  #{r3} = #{ope} double #{r1}, #{r2}"
+        ll << "  #{r3} = #{ope} #{r1}, #{r2}"
         return ll, r3
       end
     end

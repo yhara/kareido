@@ -138,6 +138,20 @@ describe Kareido do
       expect(Kareido.run(src)).to eq("")
     end
 
+    it '&&' do
+      src = "extern i32 putchar(i32); if (1 == 1 && 2 == 2) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("A")
+      src = "extern i32 putchar(i32); if (1 == 1 && 2 == 0) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("")
+    end
+
+    it '||' do
+      src = "extern i32 putchar(i32); if (1 == 0 || 2 == 2) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("A")
+      src = "extern i32 putchar(i32); if (1 == 0 || 2 == 0) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("")
+    end
+
     it 'unary -' do
       src = "extern i32 putchar(i32); putchar(-(-65));"
       expect(Kareido.run(src)).to eq("A")

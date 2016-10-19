@@ -37,6 +37,8 @@ Binary operators
     1 - 2
     1 * 2
     1 / 2   //=> 0.5
+    1 < 2   //=> true
+    1 != 1  //=> false
 
 Conditional
 

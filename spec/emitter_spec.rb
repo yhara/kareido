@@ -136,7 +136,5 @@ describe "ll emitter:" do
   end
 
   #describe "for"
-  #describe "unary expr"
-  # unary NOT
   # && ||
 end
