@@ -67,6 +67,15 @@ describe Kareido do
   end
 
   describe 'programs' do
+    it 'defun' do
+      src = <<-EOD
+        extern i32 putchar(i32);
+        func add(x, y){ return x + y; }
+        putchar(add(60, 5));
+      EOD
+      expect(Kareido.run(src)).to eq("A")
+    end
+
     it '+' do
       src = "extern i32 putchar(i32); putchar(60 + 5);"
       expect(Kareido.run(src)).to eq("A")

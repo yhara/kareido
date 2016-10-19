@@ -73,6 +73,7 @@ rule
     statement:
         if_stmt
       | for_stmt
+      | return_stmt
       | expression ';'
       { Ast::ExprStmt.new(val[0]) }
     <%= repeat0 'statement' %>
@@ -96,6 +97,10 @@ rule
     for_stmt:
         'for' '(' IDENT ';' expression '...' expression ';' expression ')' block
       { Ast::For.new(val[2], val[4], val[6], val[8], val[10]) }
+
+    return_stmt:
+        'return' expression ';'
+      { Ast::Return.new(val[1]) }
 
     expression:
         fcall
@@ -138,7 +143,7 @@ end
 require 'strscan'
 
 ---- inner
-KEYWORDS = /extern|func|if|else|for/
+KEYWORDS = /extern|func|if|else|for|return/
 
 SYMBOLS = /(\.\.\.)|(>=)|(<=)|(==)|(!=)|(&&)|(\|\|)|[\<\>\(\)\{\}\.\+\-\*\/\%\=\,;]/
 

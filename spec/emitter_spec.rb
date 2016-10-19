@@ -39,6 +39,27 @@ describe "ll emitter:" do
     end
   end
 
+  describe "func definition" do
+    it "should define a function" do
+      ll = to_ll(<<~EOD)
+        func foo(x, y) { return x; }
+        foo(123, 456);
+      EOD
+      expect(ll).to eq(<<~EOD)
+        define double @foo(double %x, double %y) {
+          ret double %x
+          ret double 0.0
+        }
+        define i32 @main() {
+          %reg1 = fadd double 0.0, 123.0
+          %reg2 = fadd double 0.0, 456.0
+          %reg3 = call double @foo(double %reg1, double %reg2)
+          ret i32 0
+        }
+      EOD
+    end
+  end
+
   describe "if stmt" do
     it "true case" do
       ll = to_ll(<<~EOD)
@@ -91,8 +112,6 @@ describe "ll emitter:" do
     end
   end
 
-  #describe "defun"
   #describe "for"
   #describe "unary expr"
-  #describe "varref"
 end
