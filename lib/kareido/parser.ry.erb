@@ -10,7 +10,7 @@
         #{name}
         { [val[0]] }
       | #{name}s #{sep} #{name}
-        { val[0].push(val[2]) }
+        { val[0].push(val[#{sep ? 2 : 1}]) }
     EOD
   end
 
