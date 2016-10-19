@@ -161,10 +161,10 @@ module Kareido
         case @value
         when Float
           r = newreg
-          return ["  %reg#{r} = add double 0.0, #{@value}"], r
+          return ["  %reg#{r} = fadd double 0.0, #{@value}"], r
         when Integer
           r = newreg
-          return ["  %reg#{r} = add double 0.0, #{@value}.0"], r
+          return ["  %reg#{r} = fadd double 0.0, #{@value}.0"], r
         else
           raise
         end

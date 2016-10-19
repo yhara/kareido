@@ -29,7 +29,7 @@ describe "ll emitter:" do
       expect(ll).to eq(<<~EOD)
         declare i32 @putchar(i32)
         define i32 @main() {
-          %reg1 = add double 0.0, 65.0
+          %reg1 = fadd double 0.0, 65.0
           %reg2 = fptosi double %reg1 to i32
           %reg3 = call i32 @putchar(i32 %reg2)
           %reg4 = sitofp i32 %reg3 to double
@@ -49,8 +49,8 @@ describe "ll emitter:" do
         expect(ll).to eq(<<~EOD)
           declare i32 @putchar(i32)
           define i32 @main() {
-            %reg1 = add double 0.0, 60.0
-            %reg2 = add double 0.0, 5.0
+            %reg1 = fadd double 0.0, 60.0
+            %reg2 = fadd double 0.0, 5.0
             %reg3 = fadd double %reg1, %reg2
             %reg4 = fptosi double %reg3 to i32
             %reg5 = call i32 @putchar(i32 %reg4)
