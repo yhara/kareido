@@ -55,4 +55,36 @@ describe Kareido do
     ast = Kareido::Parser.new.parse(MANDEL)
     expect(ast).to be_kind_of(Kareido::Ast::Node)
   end
+
+  describe '.run' do
+    it 'should run kareido program (with llc)' do
+      out = Kareido.run(<<~EOD)
+        extern i32 putchar(i32);
+        putchar(65);
+      EOD
+      expect(out).to eq("A")
+    end
+  end
+
+  describe 'programs' do
+    it '+' do
+      src = "extern i32 putchar(i32); putchar(60 + 5);"
+      expect(Kareido.run(src)).to eq("A")
+    end
+
+    it '-' do
+      src = "extern i32 putchar(i32); putchar(70 - 5);"
+      expect(Kareido.run(src)).to eq("A")
+    end
+
+    it '*' do
+      src = "extern i32 putchar(i32); putchar(13 * 5);"
+      expect(Kareido.run(src)).to eq("A")
+    end
+
+    it '/' do
+      src = "extern i32 putchar(i32); putchar(157 / 2.41);"
+      expect(Kareido.run(src)).to eq("A")
+    end
+  end
 end
