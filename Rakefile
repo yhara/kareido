@@ -10,6 +10,9 @@ file 'lib/kareido/parser.rb' => 'lib/kareido/parser.ry' do
   sh cmd
 end
 
-task :default => 'lib/kareido/parser.rb' do
+desc "run test"
+task :test => 'lib/kareido/parser.rb' do
   sh "rspec"
 end
+
+task :default => :test

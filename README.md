@@ -2,6 +2,19 @@
 
 Yet another LLVM example program, inspired by [the official one](http://llvm.org/docs/tutorial/)
 
+## Prerequisites
+
+- Ruby (tested with 2.3)
+
+## How to run
+
+```
+$ bundle install
+$ bundle exec rake test
+```
+
+TODO: implement ./exe/kareido
+
 ## The Language
 
 Number (all numbers are treated as `double`)
