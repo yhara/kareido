@@ -5,15 +5,31 @@ Yet another LLVM example program, inspired by [the official one](http://llvm.org
 ## Prerequisites
 
 - Ruby (tested with 2.3)
+- LLVM (eg. `brew install llvm` on macOS. Tested with 3.8.1)
 
 ## How to run
 
 ```
 $ bundle install
-$ bundle exec rake test
 ```
 
-TODO: implement ./exe/kareido
+Make a file `a.kar` like:
+
+```
+extern i32 putchar(i32);
+putchar(65);
+```
+
+```
+$ bundle exec kareido compile a.kar   #=> creates a.ll
+$ bundle exec kareido exec a.kar      #=> creates a.ll and run it with lli
+```
+
+## How to run test
+
+```
+$ bundle exec rake test
+```
 
 ## The Language
 
