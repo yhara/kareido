@@ -31,7 +31,7 @@ class Kareido::Parser
   token IDENT FLOAT INTEGER
 
   prechigh
-    nonassoc UMINUS
+    right UMINUS
     left '*' '/' '%'
     left '+' '-'
     left '>' '>=' '<' '<='
