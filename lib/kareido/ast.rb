@@ -28,6 +28,8 @@ module Kareido
       attr_reader :externs
 
       def to_ll
+        Node.reset_regnum
+
         lines = defs.flat_map{|x| x.to_ll(self)} +
                 main.to_ll(self)
         return lines.join("\n") + "\n"

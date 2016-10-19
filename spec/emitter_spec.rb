@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe "ll emitter:" do
   def to_ll(src)
-    Kareido::Ast::Node.reset_regnum
     ast = Kareido::Parser.new.parse(src)
     ast.to_ll
   end
