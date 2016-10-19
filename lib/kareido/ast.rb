@@ -94,7 +94,7 @@ module Kareido
     end
 
     class For < Node
-      props :varname, :nbegin, :nend, :step
+      props :varname, :nbegin, :nend, :step, :body_stmts
     end
 
     class ExprStmt < Node

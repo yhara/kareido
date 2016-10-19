@@ -95,7 +95,7 @@ rule
 
     for_stmt:
         'for' '(' IDENT ';' expression '...' expression ';' expression ')' block
-      { Ast::For.new(val[2], val[4], val[6], val[8]) }
+      { Ast::For.new(val[2], val[4], val[6], val[8], val[10]) }
 
     expression:
         fcall
