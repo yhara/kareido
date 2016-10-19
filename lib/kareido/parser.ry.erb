@@ -163,7 +163,7 @@ def parse(str)
       @q << [:INTEGER, m.to_i]
     when m = s.scan(KEYWORDS)
       @q << [m, m.to_sym]
-    when m = s.scan(/\w+/)
+    when m = s.scan(/[\w_]+/)
       @q << [:IDENT, m]
     else
       raise "no match: #{s.inspect}"
