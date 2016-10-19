@@ -148,23 +148,23 @@ module Kareido
       props :cond_expr, :then_stmts, :else_stmts
 
       def to_ll(prog, env)
-        l = newif
+        i = newif
         cond_ll, cond_r = @cond_expr.to_ll_r(prog, env)
         then_ll = @then_stmts.flat_map{|x| x.to_ll(prog, env)}
         else_ll = @else_stmts.flat_map{|x| x.to_ll(prog, env)}
 
         ll = []
         ll.concat cond_ll
-        endif = (@else_stmts.any? ? "%Else#{l}" : "%EndIf#{l}")
-        ll << "  br i1 #{cond_r}, label %Then#{l}, label #{endif}"
-        ll << "Then#{l}:"
+        endif = (@else_stmts.any? ? "%Else#{i}" : "%EndIf#{i}")
+        ll << "  br i1 #{cond_r}, label %Then#{i}, label #{endif}"
+        ll << "Then#{i}:"
         ll.concat then_ll
-        ll << "  br label %EndIf#{l}"
+        ll << "  br label %EndIf#{i}"
         if @else_stmts.any?
-          ll << "Else#{l}:"
+          ll << "Else#{i}:"
           ll.concat else_ll  # fallthrough
         end
-        ll << "EndIf#{l}:"
+        ll << "EndIf#{i}:"
         return ll
       end
     end
