@@ -86,5 +86,47 @@ describe Kareido do
       src = "extern i32 putchar(i32); putchar(157 / 2.41);"
       expect(Kareido.run(src)).to eq("A")
     end
+
+    it '==' do
+      src = "extern i32 putchar(i32); if (1 == 1) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("A")
+      src = "extern i32 putchar(i32); if (1 == 2) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("")
+    end
+
+    it '>' do
+      src = "extern i32 putchar(i32); if (2 > 1) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("A")
+      src = "extern i32 putchar(i32); if (1 > 2) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("")
+    end
+
+    it '>=' do
+      src = "extern i32 putchar(i32); if (1 >= 1) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("A")
+      src = "extern i32 putchar(i32); if (1 >= 2) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("")
+    end
+
+    it '<' do
+      src = "extern i32 putchar(i32); if (1 < 2) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("A")
+      src = "extern i32 putchar(i32); if (2 < 1) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("")
+    end
+
+    it '<=' do
+      src = "extern i32 putchar(i32); if (1 <= 1) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("A")
+      src = "extern i32 putchar(i32); if (2 <= 1) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("")
+    end
+
+    it '!=' do
+      src = "extern i32 putchar(i32); if (1 != 2) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("A")
+      src = "extern i32 putchar(i32); if (1 != 1) { putchar(65); }"
+      expect(Kareido.run(src)).to eq("")
+    end
   end
 end

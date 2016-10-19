@@ -62,8 +62,36 @@ describe "ll emitter:" do
     end
   end
 
+  describe "if stmt" do
+    it "true case" do
+      ll = to_ll(<<~EOD)
+        extern i32 putchar(i32);
+        if (1 < 2) {
+          putchar(65);
+        }
+      EOD
+      expect(ll).to eq(<<~EOD)
+        declare i32 @putchar(i32)
+        define i32 @main() {
+        Test1:
+          %reg1 = fadd double 0.0, 1.0
+          %reg2 = fadd double 0.0, 2.0
+          %reg3 = fcmp olt double %reg1, %reg2
+          br i1 %reg3, label %Then1, label %EndIf1
+        Then1:
+          %reg4 = fadd double 0.0, 65.0
+          %reg5 = fptosi double %reg4 to i32
+          %reg6 = call i32 @putchar(i32 %reg5)
+          %reg7 = sitofp i32 %reg6 to double
+          br label %EndIf1
+        EndIf1:
+          ret i32 0
+        }
+      EOD
+    end
+  end
+
   #describe "defun"
-  #describe "if"
   #describe "for"
   #describe "unary expr"
   #describe "varref"

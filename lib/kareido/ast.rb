@@ -3,14 +3,18 @@ module Kareido
     class Node
       extend Props
 
-      # For testing
-      def self.reset_regnum
+      def self.reset
         @@reg = 0
+        @@if = 0
       end
-      reset_regnum
+      reset
 
       def newreg
         return (@@reg += 1)
+      end
+
+      def newif
+        return (@@if += 1)
       end
     end
 
@@ -28,7 +32,7 @@ module Kareido
       attr_reader :externs
 
       def to_ll
-        Node.reset_regnum
+        Node.reset
 
         lines = defs.flat_map{|x| x.to_ll(self)} +
                 main.to_ll(self)
@@ -65,6 +69,27 @@ module Kareido
 
     class If < Node
       props :cond_expr, :then_stmts, :else_stmts
+
+      def to_ll(prog)
+        l = newif
+        cond_ll, cond_r = @cond_expr.to_ll_r(prog)
+        then_ll = @then_stmts.flat_map{|x| x.to_ll(prog)}
+        else_ll = @else_stmts.flat_map{|x| x.to_ll(prog)}
+
+        ll = []
+        ll << "Test#{l}:"
+        ll.concat cond_ll
+        endif = (@else_stmts.any? ? "%Else#{l}" : "%EndIf#{l}")
+        ll << "  br i1 %reg#{cond_r}, label %Then#{l}, label #{endif}"
+        ll << "Then#{l}:"
+        ll.concat then_ll
+        ll << "  br label %EndIf#{l}"
+        if @else_stmts.any?
+          ll << "Else#{l}:"
+          ll.concat else_ll  # fallthrough
+        end
+        ll << "EndIf#{l}:"
+      end
     end
 
     class For < Node
@@ -86,8 +111,15 @@ module Kareido
       "*" => "fmul",
       "/" => "fdiv",
       "%" => "frem",
+
+      "==" => "fcmp oeq",
+      ">" => "fcmp ogt",
+      ">=" => "fcmp oge",
+      "<" => "fcmp olt",
+      "<=" => "fcmp ole",
+      "!=" => "fcmp one",
     }
-    # TODO: > < >= <= == != && ||
+    # TODO: && ||
     class BinExpr < Node
       props :op, :left_expr, :right_expr
 
