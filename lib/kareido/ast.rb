@@ -228,6 +228,16 @@ module Kareido
 
     class UnaryExpr < Node
       props :op, :expr
+
+      def to_ll_r(prog, env)
+        expr_ll, expr_r = expr.to_ll_r(prog, env)
+
+        r = newreg
+        ll = []
+        ll.concat expr_ll
+        ll << "  #{r} = fsub double 0.0, #{expr_r}"
+        return ll, r
+      end
     end
 
     class FunCall < Node

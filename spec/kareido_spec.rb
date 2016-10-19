@@ -137,5 +137,10 @@ describe Kareido do
       src = "extern i32 putchar(i32); if (1 != 1) { putchar(65); }"
       expect(Kareido.run(src)).to eq("")
     end
+
+    it 'unary -' do
+      src = "extern i32 putchar(i32); putchar(-(-65));"
+      expect(Kareido.run(src)).to eq("A")
+    end
   end
 end

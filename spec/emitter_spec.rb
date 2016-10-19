@@ -89,7 +89,7 @@ describe "ll emitter:" do
     end
   end
 
-  context "binary expr" do
+  describe "binary expr" do
     describe "`+`" do
       it "should conveted to add" do
         ll = to_ll(<<~EOD)
@@ -112,6 +112,31 @@ describe "ll emitter:" do
     end
   end
 
+  describe "unary expr" do
+    describe "-" do
+      it "should flip the sign" do
+        ll = to_ll(<<~EOD)
+          func foo(x) { return -x; }
+          foo(3);
+        EOD
+        expect(ll).to eq(<<~EOD)
+          define double @foo(double %x) {
+            %reg1 = fsub double 0.0, %x
+            ret double %reg1
+            ret double 0.0
+          }
+          define i32 @main() {
+            %reg2 = fadd double 0.0, 3.0
+            %reg3 = call double @foo(double %reg2)
+            ret i32 0
+          }
+        EOD
+      end
+    end
+  end
+
   #describe "for"
   #describe "unary expr"
+  # unary NOT
+  # && ||
 end
