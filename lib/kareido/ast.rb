@@ -169,6 +169,7 @@ module Kareido
           ll << "Else#{i}:"
           ll.concat else_ll  # fallthrough
         end
+        ll << "  br label %EndIf#{i}"
         ll << "EndIf#{i}:"
         return ll
       end
