@@ -339,11 +339,9 @@ module Kareido
       def to_ll_r(prog, env)
         case @value
         when Float
-          r = newreg
-          return ["  #{r} = fadd double 0.0, #{@value}"], r
+          return [], @value.to_s
         when Integer
-          r = newreg
-          return ["  #{r} = fadd double 0.0, #{@value}.0"], r
+          return [], "#{@value}.0"
         else
           raise
         end

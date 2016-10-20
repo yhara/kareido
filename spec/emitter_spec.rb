@@ -29,10 +29,9 @@ describe "ll emitter:" do
       expect(ll).to eq(<<~EOD)
         declare i32 @putchar(i32)
         define i32 @main() {
-          %reg1 = fadd double 0.0, 65.0
-          %reg2 = fptosi double %reg1 to i32
-          %reg3 = call i32 @putchar(i32 %reg2)
-          %reg4 = sitofp i32 %reg3 to double
+          %reg1 = fptosi double 65.0 to i32
+          %reg2 = call i32 @putchar(i32 %reg1)
+          %reg3 = sitofp i32 %reg2 to double
           ret i32 0
         }
       EOD
@@ -51,9 +50,7 @@ describe "ll emitter:" do
           ret double 0.0
         }
         define i32 @main() {
-          %reg1 = fadd double 0.0, 123.0
-          %reg2 = fadd double 0.0, 456.0
-          %reg3 = call double @foo(double %reg1, double %reg2)
+          %reg1 = call double @foo(double 123.0, double 456.0)
           ret i32 0
         }
       EOD
@@ -71,15 +68,12 @@ describe "ll emitter:" do
       expect(ll).to eq(<<~EOD)
         declare i32 @putchar(i32)
         define i32 @main() {
-          %reg1 = fadd double 0.0, 1.0
-          %reg2 = fadd double 0.0, 2.0
-          %reg3 = fcmp olt double %reg1, %reg2
-          br i1 %reg3, label %Then1, label %EndIf1
+          %reg1 = fcmp olt double 1.0, 2.0
+          br i1 %reg1, label %Then1, label %EndIf1
         Then1:
-          %reg4 = fadd double 0.0, 65.0
-          %reg5 = fptosi double %reg4 to i32
-          %reg6 = call i32 @putchar(i32 %reg5)
-          %reg7 = sitofp i32 %reg6 to double
+          %reg2 = fptosi double 65.0 to i32
+          %reg3 = call i32 @putchar(i32 %reg2)
+          %reg4 = sitofp i32 %reg3 to double
           br label %EndIf1
         EndIf1:
           ret i32 0
@@ -101,21 +95,18 @@ describe "ll emitter:" do
         define i32 @main() {
           br label %For1
         For1:
-          %reg1 = fadd double 0.0, 65.0
-          %reg2 = fadd double 0.0, 70.0
-          %reg3 = fadd double 0.0, 2.0
           br label %Loop1
         Loop1:
-          %x = phi double [%reg1, %For1], [%fori1, %ForInc1]
-          %forc1 = fcmp oge double %x, %reg2
+          %x = phi double [65.0, %For1], [%fori1, %ForInc1]
+          %forc1 = fcmp oge double %x, 70.0
           br i1 %forc1, label %EndFor1, label %ForBody1
         ForBody1:
-          %reg4 = fptosi double %x to i32
-          %reg5 = call i32 @putchar(i32 %reg4)
-          %reg6 = sitofp i32 %reg5 to double
+          %reg1 = fptosi double %x to i32
+          %reg2 = call i32 @putchar(i32 %reg1)
+          %reg3 = sitofp i32 %reg2 to double
           br label %ForInc1
         ForInc1:
-          %fori1 = fadd double %x, %reg3
+          %fori1 = fadd double %x, 2.0
           br label %Loop1
         EndFor1:
           ret i32 0
@@ -134,12 +125,10 @@ describe "ll emitter:" do
         expect(ll).to eq(<<~EOD)
           declare i32 @putchar(i32)
           define i32 @main() {
-            %reg1 = fadd double 0.0, 60.0
-            %reg2 = fadd double 0.0, 5.0
-            %reg3 = fadd double %reg1, %reg2
-            %reg4 = fptosi double %reg3 to i32
-            %reg5 = call i32 @putchar(i32 %reg4)
-            %reg6 = sitofp i32 %reg5 to double
+            %reg1 = fadd double 60.0, 5.0
+            %reg2 = fptosi double %reg1 to i32
+            %reg3 = call i32 @putchar(i32 %reg2)
+            %reg4 = sitofp i32 %reg3 to double
             ret i32 0
           }
         EOD
@@ -161,8 +150,7 @@ describe "ll emitter:" do
             ret double 0.0
           }
           define i32 @main() {
-            %reg2 = fadd double 0.0, 3.0
-            %reg3 = call double @foo(double %reg2)
+            %reg2 = call double @foo(double 3.0)
             ret i32 0
           }
         EOD
